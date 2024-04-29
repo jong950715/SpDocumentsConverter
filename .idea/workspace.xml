@@ -4,22 +4,34 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="505b78ad-d1c6-44da-864d-d95b3f3baeda" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/SpExConverter.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/BugReporter.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/read/SpExReader.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/read/model/Customer.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/read/model/Identifier.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/read/model/Order.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/read/model/Receiver.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/read/model/Sender.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/read/tools.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/영업부-출고관리(2024년1월~3월)240326.xlsx" afterDir="false" />
+    <list default="true" id="505b78ad-d1c6-44da-864d-d95b3f3baeda" name="Changes" comment="order parsing done.">
+      <change afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/definitions.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/gui/MyGui.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/gui/SpExGui.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/gui/ToggleGui.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/read/card/CardReader.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/read/ecount_api/EcountApi.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/read/toggle/ToggleReader.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/read/wehago/WehagoBalance.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/read/wehago/document/WehagoDocument.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/read/wehago/document/위하고_매입매출전표_0201~0428.xlsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/write/ecount/EcountFromSpExParser.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/write/ecount/EcountFromToggleParser.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/write/ecount/EcountWriter.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/write/howmuch/HowWriter.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/write/howmuch/OrderReaderHow.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/write/spEx/SpExWriter.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/write/spEx/오픈몰 출고 지시서_수건어물.xlsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/write/wehago/OrderReaderWehago.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/write/wehago/WehagoWriter.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/example.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/read/SpExReader.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/read/SpExReader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/read/model/Customer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/read/model/Customer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/read/model/Identifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/read/model/Identifier.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/read/model/Order.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/read/model/Order.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/read/model/Sender.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/read/model/Sender.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,34 +57,130 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.Order.executor": "Run",
-    "Python.Receiver.executor": "Run",
-    "Python.SpExReader.executor": "Run",
-    "Python.tools.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "C:/Users/CS/PycharmProjects/SpExConverter/src/read/model",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.Customer.executor&quot;: &quot;Run&quot;,
+    &quot;Python.EcountApi.executor&quot;: &quot;Run&quot;,
+    &quot;Python.EcountOrderReader.executor&quot;: &quot;Run&quot;,
+    &quot;Python.EcountWriter.executor&quot;: &quot;Run&quot;,
+    &quot;Python.HowWriter.executor&quot;: &quot;Run&quot;,
+    &quot;Python.MyGui.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Order.executor&quot;: &quot;Run&quot;,
+    &quot;Python.OrderReaderHow.executor&quot;: &quot;Run&quot;,
+    &quot;Python.OrderReaderWehago.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Receiver.executor&quot;: &quot;Run&quot;,
+    &quot;Python.SpExReader.executor&quot;: &quot;Run&quot;,
+    &quot;Python.ToggleReader.executor&quot;: &quot;Run&quot;,
+    &quot;Python.WehagoBalance.executor&quot;: &quot;Run&quot;,
+    &quot;Python.WehagoDocument.executor&quot;: &quot;Run&quot;,
+    &quot;Python.WehagoWriter.executor&quot;: &quot;Run&quot;,
+    &quot;Python.definitions.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.tools.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/CS/PycharmProjects/SpExConverter/src/write/ecount&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\CS\PycharmProjects\SpExConverter\src\write\ecount" />
+      <recent name="C:\Users\CS\PycharmProjects\SpExConverter\src" />
       <recent name="C:\Users\CS\PycharmProjects\SpExConverter\src\read\model" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\CS\PycharmProjects\SpExConverter\src" />
-      <recent name="C:\Users\CS\PycharmProjects\SpExConverter\read" />
-      <recent name="C:\Users\CS\PycharmProjects\SpExConverter" />
+      <recent name="C:\Users\CS\PycharmProjects\SpExConverter\src\write\spEx" />
+      <recent name="C:\Users\CS\PycharmProjects\SpExConverter\src\read\wehago\document" />
+      <recent name="C:\Users\CS\PycharmProjects\SpExConverter\src\read\wehago" />
+      <recent name="C:\Users\CS\PycharmProjects\SpExConverter\src\write\ecount" />
+      <recent name="C:\Users\CS\PycharmProjects\SpExConverter\src\write\wehago" />
     </key>
+  </component>
+  <component name="RunManager" selected="Python.OrderReaderWehago">
+    <configuration name="OrderReaderWehago" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="SpExConverter" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/write/wehago" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/write/wehago/OrderReaderWehago.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="SpExReader" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="SpExConverter" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/read" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/read/SpExReader.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="WehagoDocument" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="SpExConverter" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/read/wehago/document" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/read/wehago/document/WehagoDocument.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.WehagoDocument" />
+        <item itemvalue="Python.OrderReaderWehago" />
+        <item itemvalue="Python.SpExReader" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -91,17 +199,70 @@
       <updated>1713354505101</updated>
       <workItem from="1713354509165" duration="12199000" />
       <workItem from="1713404473018" duration="2723000" />
-      <workItem from="1713420598466" duration="6446000" />
+      <workItem from="1713420598466" duration="28742000" />
+      <workItem from="1713520660825" duration="214000" />
+      <workItem from="1713528035375" duration="829000" />
+      <workItem from="1713762243718" duration="2970000" />
+      <workItem from="1713799092814" duration="30000" />
+      <workItem from="1713799242191" duration="1624000" />
+      <workItem from="1713829235375" duration="13091000" />
+      <workItem from="1713939496090" duration="599000" />
+      <workItem from="1713968285515" duration="3585000" />
+      <workItem from="1714005870791" duration="2956000" />
+      <workItem from="1714014923633" duration="12110000" />
+      <workItem from="1714050204148" duration="2539000" />
+      <workItem from="1714093753399" duration="7946000" />
+      <workItem from="1714127863926" duration="5699000" />
+      <workItem from="1714289485084" duration="12403000" />
+      <workItem from="1714349074297" duration="2504000" />
     </task>
+    <task id="LOCAL-00001" summary="order parsing done.">
+      <option name="closed" value="true" />
+      <created>1713427106864</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1713427106865</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="order parsing done." />
+    <option name="LAST_COMMIT_MESSAGE" value="order parsing done." />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/read/wehago/WehagoBalance.py</url>
+          <line>86</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/SpExConverter$Receiver.coverage" NAME="Receiver Coverage Results" MODIFIED="1713425755115" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/read/model" />
     <SUITE FILE_PATH="coverage/SpExConverter$tools.coverage" NAME="tools Coverage Results" MODIFIED="1713372375871" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/read" />
-    <SUITE FILE_PATH="coverage/SpExConverter$SpExReader.coverage" NAME="SpExReader Coverage Results" MODIFIED="1713426311044" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/read" />
+    <SUITE FILE_PATH="coverage/SpExConverter$EcountApi.coverage" NAME="EcountApi Coverage Results" MODIFIED="1713885412396" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/read/ecount_api" />
+    <SUITE FILE_PATH="coverage/SpExConverter$definitions.coverage" NAME="definitions Coverage Results" MODIFIED="1714103777771" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/SpExConverter$WehagoBalance.coverage" NAME="WehagoBalance Coverage Results" MODIFIED="1714309389911" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/read/wehago" />
+    <SUITE FILE_PATH="coverage/SpExConverter$WehagoWriter.coverage" NAME="WehagoWriter Coverage Results" MODIFIED="1713443062794" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/write/wehago" />
+    <SUITE FILE_PATH="coverage/SpExConverter$SpExReader.coverage" NAME="SpExReader Coverage Results" MODIFIED="1713861552088" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/read" />
     <SUITE FILE_PATH="coverage/SpExConverter$Order.coverage" NAME="Order Coverage Results" MODIFIED="1713421519978" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/read/model" />
+    <SUITE FILE_PATH="coverage/SpExConverter$main.coverage" NAME="main Coverage Results" MODIFIED="1714131348718" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/SpExConverter$Receiver.coverage" NAME="Receiver Coverage Results" MODIFIED="1713425755115" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/read/model" />
+    <SUITE FILE_PATH="coverage/SpExConverter$OrderReaderHow.coverage" NAME="OrderReaderHow Coverage Results" MODIFIED="1713452119579" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/write/howmuch" />
+    <SUITE FILE_PATH="coverage/SpExConverter$WehagoDocument.coverage" NAME="WehagoDocument Coverage Results" MODIFIED="1714319539668" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/read/wehago/document" />
+    <SUITE FILE_PATH="coverage/SpExConverter$EcountOrderReader.coverage" NAME="EcountOrderReader Coverage Results" MODIFIED="1713858166596" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/write/ecount" />
+    <SUITE FILE_PATH="coverage/SpExConverter$EcountWriter.coverage" NAME="EcountWriter Coverage Results" MODIFIED="1714007698922" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/write/ecount" />
+    <SUITE FILE_PATH="coverage/SpExConverter$OrderReaderWehago.coverage" NAME="OrderReaderWehago Coverage Results" MODIFIED="1714128193459" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/write/wehago" />
+    <SUITE FILE_PATH="coverage/SpExConverter$HowWriter.coverage" NAME="HowWriter Coverage Results" MODIFIED="1713763881321" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/write/howmuch" />
+    <SUITE FILE_PATH="coverage/SpExConverter$Customer.coverage" NAME="Customer Coverage Results" MODIFIED="1713763469276" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/read/model" />
+    <SUITE FILE_PATH="coverage/SpExConverter$MyGui.coverage" NAME="MyGui Coverage Results" MODIFIED="1714294096300" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/gui" />
+    <SUITE FILE_PATH="coverage/SpExConverter$ToggleReader.coverage" NAME="ToggleReader Coverage Results" MODIFIED="1713969229939" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/read/toggle" />
   </component>
 </project>

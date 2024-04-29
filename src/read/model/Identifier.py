@@ -1,10 +1,11 @@
+from datetime import datetime
 from typing import Dict
 
 
 class Identifier:
     def __init__(self, identifier, date):
         self.identifier = identifier
-        self.date = date
+        self.date: datetime = date
 
     @classmethod
     def fromRow(cls, row):
@@ -52,7 +53,7 @@ def _getIdentifiers():
     ss1 = ['월', '화', '수', '목', '금', '토', '일']
     ss2 = ['요일', '욜']
     ss3 = ['택배', '배송']
-    etc = ['행복앤미소', '수건어물']
+    etc = ['행복앤미소', '수건어물', '직배송']
     for s1 in ss1:
         for s2 in ss2:
             for s3 in ss3:
