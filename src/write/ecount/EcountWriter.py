@@ -4,6 +4,7 @@ from collections import defaultdict
 from typing import Dict, List
 
 import openpyxl
+from openpyxl.worksheet.worksheet import Worksheet
 
 from src.definitions import getTempDir
 from src.read.SpExReader import SpExReader
@@ -14,12 +15,24 @@ from src.write.ecount.EcountFromToggleParser import EcountFromToggleParser
 
 
 class EcountWriter:
-    def __init__(self, sheet):
-        self.sheet = sheet
+    def __init__(self, spExReader: SpExReader, toggleReader: ToggleReader):
+        self.spExReader = spExReader
+        self.toggleReader = toggleReader
+
+    @classmethod
+    def fromSheet(cls, sheet: Worksheet):
+        spExReader = SpExReader.fromSheet(sheet)
+        toggleReader = ToggleReader.fromSheet(sheet)
+        return cls(spExReader, toggleReader)
+
+    @classmethod
+    def fromDatas(cls, datas: List[List]):
+        spExReader = SpExReader.fromDatas(datas)
+        # toggleReader = ToggleReader.fromSheet(sheet)
+        return cls(spExReader, None)
 
     def getDocsFromSpEx(self):
-        spExReader = SpExReader.fromSheet(self.sheet)
-        orders: List[Order] = spExReader.getOrders()
+        orders: List[Order] = self.spExReader.getOrders()
 
         res = []
         # prevOrder = DUMMY_ORDER
@@ -38,13 +51,12 @@ class EcountWriter:
         for x in res[::-1]:
             ecountDocuments.append(x)
 
-        filePath = '{0}/{1}-{2}.xlsx'.format(getTempDir(), 'EcountWriter', time.strftime("%Y%m%d-%H%M"))
+        filePath = '{0}/{1}-{2}.xlsx'.format(getTempDir(), 'EcountWriter', time.strftime("%Y%m%d-%H%M%S"))
         wb.save(filePath)  # 같은이름 있는지 확인
         os.startfile(filePath)
 
     def getDocsFromToggle(self):
-        toggleReader = ToggleReader.fromSheet(self.sheet)
-        orders: List[Dict] = toggleReader.getOrders()
+        orders: List[Dict] = self.toggleReader.getOrders()
         wb = openpyxl.Workbook()
         ws = wb.active
 

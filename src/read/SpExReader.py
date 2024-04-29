@@ -6,7 +6,7 @@ from functools import reduce
 import openpyxl
 import re
 
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Iterable
 
 from openpyxl.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
@@ -21,8 +21,13 @@ from src.read.tools import isString
 
 TITLES = ['시간', '챙길것', '품목', '수량', '보험사', '지점', '주문자이름', '주소', '전화번호', '단가', '금액', '수금']
 END_WORDS = ['#끝', '#END#']
-MAX_COL = 13
+MAX_COL = 15
 MAX_ROW = 500
+
+
+class _Wrapper:
+    def __init__(self, value):
+        self.value = value
 
 
 def onlyKCharacter(row):
@@ -37,31 +42,58 @@ def _isMemo(row: Dict[str, str]) -> bool:
     return True
 
 
+def isTitleRow(row: tuple):
+    row = onlyKCharacter(row)
+    for title in TITLES:
+        if title not in row:
+            return False
+    else:
+        return True
+
+
+def getTitleRowInfo(sheet: Worksheet):
+    for row in sheet.iter_rows(min_row=1, max_row=MAX_ROW, max_col=MAX_COL):
+        if isTitleRow(row):
+            return onlyKCharacter(row), row[0].row
+    else:
+        raise Exception("Title이 인식되지 않았습니다.")  # return false 하고 버그리포트
+
+
 class SpExReader:
-    def __init__(self, sheet: Worksheet):
-        self.sheet = sheet
-        self.titles, self.titleRow = self.getTitleRowInfo()
+    def __init__(self, it: iter):
+        row = []
+        while not isTitleRow(row):
+            row = it.__next__()
+        self.titles = onlyKCharacter(row)
+        self.it = it
 
         self.identifier: Identifier = DUMMY_IDENTIFIER
         self.sender: Sender = SENDER_SUNGPOONG
         self.customer: Customer = DUMMY_CUSTOMER
         self.receiver: Receiver = DUMMY_RECEIVER
 
-
     @classmethod
     def fromFileName(cls, fileName: str):
         wb = openpyxl.load_workbook(fileName, read_only=True, data_only=True)
         sheet = wb.active
         sheet = wb[sheet.title]
-        return cls(sheet)
+        return cls.fromSheet(sheet)
 
     @classmethod
     def fromSheet(cls, sheet: Worksheet):
-        return cls(sheet)
+        it = sheet.iter_rows(max_row=MAX_ROW, max_col=MAX_COL)
+        return cls(it)
+
+    @classmethod
+    def fromDatas(cls, datas: List[List]):
+        return cls(map(
+            lambda row: list(map(_Wrapper, row)),
+            datas))
 
     def getOrders(self) -> List[Order]:
         orders = []
-        for row in self.sheet.iter_rows(min_row=self.titleRow + 1, max_row=MAX_ROW, max_col=MAX_COL):
+        # for row in self.sheet.iter_rows(min_row=self.titleRow + 1, max_row=MAX_ROW, max_col=MAX_COL):
+        for row in self.it:
             execptionChecker = []  # for debug
             row = self.rowToDict(row)
             if self.isPoisonPill(row):
@@ -126,21 +158,6 @@ class SpExReader:
         for cell, title in zip(row, self.titles):
             res[title] = cell.value
         return res
-
-    def getTitleRowInfo(self):
-        for row in self.sheet.iter_rows(min_row=1, max_row=MAX_ROW, max_col=MAX_COL):
-            if self.isTitleRow(row):
-                return onlyKCharacter(row), row[0].row
-        else:
-            raise Exception("Title이 인식되지 않았습니다.")  # return false 하고 버그리포트
-
-    def isTitleRow(self, row: tuple):
-        row = onlyKCharacter(row)
-        for title in TITLES:
-            if title not in row:
-                return False
-        else:
-            return True
 
 
 if __name__ == '__main__':

@@ -69,9 +69,9 @@ class Order:
 
     @staticmethod
     def verifyRow(row: Dict[str, str]) -> bool:
-        if (not isinstance(row['단가'], int)
-                or not isinstance(row['금액'], int)
-                or not isinstance(row['수량'], int)):
+        if (not isinstance(row['단가'], (int, float))
+                or not isinstance(row['금액'], (int, float))
+                or not isinstance(row['수량'], (int, float))):
             return False
         if not isString(row['품목']):
             return False

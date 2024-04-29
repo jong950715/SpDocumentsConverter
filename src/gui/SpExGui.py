@@ -2,7 +2,7 @@ import shutil
 import time
 from tkinter import Tk, Label, Button, filedialog, BooleanVar, StringVar, DISABLED, Frame
 from tkinter.ttk import Combobox, Checkbutton
-from typing import Dict
+from typing import Dict, List, Union
 
 import openpyxl
 import xlwings
@@ -55,14 +55,14 @@ class SpExGui:
         for i, x in enumerate(outKind):
             if x in ['CJ택배송장', '얼마에요']:
                 Checkbutton(root, text=x, variable=self.outChkState[x], state=DISABLED).grid(column=i + 1,
-                                                                                                   **_grid)
+                                                                                             **_grid)
                 continue
             Checkbutton(root, text=x, variable=self.outChkState[x]).grid(column=i + 1, **_grid)
 
         # row3
         _grid['row'] = 3
-        self.runButton = Button(root, text='실행하기', command=self.runWithSelectedSheet)
-        self.runButton.grid(column=1, **_grid)
+        self.runWithSelectedSheetButton = Button(root, text='실행하기', command=self.runWithSelectedSheet)
+        self.runWithSelectedSheetButton.grid(column=1, **_grid)
 
     def _init2(self, root):
         _grid = {'padx': 6, 'pady': 6}
@@ -72,14 +72,19 @@ class SpExGui:
         for i, x in enumerate(outKind):
             if x in ['CJ택배송장', '얼마에요']:
                 Checkbutton(root, text=x, variable=self.outChkState[x], state=DISABLED).grid(column=i + 1,
-                                                                                                   **_grid)
+                                                                                             **_grid)
                 continue
             Checkbutton(root, text=x, variable=self.outChkState[x]).grid(column=i + 1, **_grid)
 
         # row1
         _grid['row'] = 1
-        self.runButton = Button(root, text='현재시트로 바로 실행하기', command=self.runWithActiveSheet)
-        self.runButton.grid(column=2, **_grid)
+        self.runWithActiveSheetButton = Button(root, text='현재시트로 바로 실행하기', command=self.runWithActiveSheet)
+        self.runWithActiveSheetButton.grid(column=2, **_grid)
+
+        # row2
+        _grid['row'] = 2
+        self.runWithSelectedRangeButton = Button(root, text='선택영역으로 바로 실행하기', command=self.runWithSelectedRange)
+        self.runWithSelectedRangeButton.grid(column=2, **_grid)
 
     def findFile(self):
         self.fileNameLabel.config(text="파일 선택중")
@@ -115,18 +120,23 @@ class SpExGui:
         newBook.save(newFilePathName)
 
         spSheet = openpyxl.load_workbook(newFilePathName, read_only=True, data_only=True)[NEW_SHEETNAME]
-        self._run(spSheet)
+        self._run(self.runWithActiveSheetButton, sheet=spSheet)
+
+    def runWithSelectedRange(self):
+        datas: List[list] = [xlwings.books.active.sheets.active.range('TITLES').value]
+        datas.extend(xlwings.books.active.app.selection.value)
+        self._run(self.runWithSelectedRangeButton, datas=datas)
 
     def runWithSelectedSheet(self):
         sheetName = self.sheetCombobox.get()
         spSheet = openpyxl.load_workbook(self.spExFile, read_only=True, data_only=True)[sheetName]
-        self._run(spSheet)
+        self._run(self.runWithSelectedSheetButton, sheet=spSheet)
 
-    def _run(self, sheet: Worksheet):
-        self.runButton.config(text='실행중 입니다.')
+    def _run(self, button: Button, sheet: Worksheet = None, datas: List[List] = None):
+        button.config(text='실행중 입니다.')
         self.root1.update()
 
-        Writer = {
+        Writer: Dict[str, Union[WehagoWriter, EcountWriter, None]] = {
             '위하고': WehagoWriter,
             '이카운트': EcountWriter,
             '얼마에요': None,
@@ -135,9 +145,12 @@ class SpExGui:
 
         for k, chk in self.outChkState.items():
             if chk.get():
-                Writer[k](sheet).getDocsFromSpEx()
+                if sheet is not None:
+                    Writer[k].fromSheet(sheet).getDocsFromSpEx()
+                elif datas is not None:
+                    Writer[k].fromDatas(datas).getDocsFromSpEx()
 
-        self.runButton.config(text='완료되었습니다.')
+        button.config(text='완료되었습니다.')
 
 
 if __name__ == '__main__':

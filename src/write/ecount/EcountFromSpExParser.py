@@ -9,7 +9,7 @@ from src.read.SpExReader import SpExReader
 from src.read.model.Order import Order
 
 ECOUNT_TITLE = ['일자', '순번', '거래처코드', '거래처명', '담당자', '이름', '주소', '전화번호', '이름(보내는 분)', '주소(보내는 분)', '전화번호(보내는 분)', '거래유형',
-                '적요', '품목코드', '품목명', '규격', '수량', '단가', '외화금액', '공급가액', '부가세', '적요(상품)', '생산전표생성', ]
+                '적요', '우-메모', '품목코드', '품목명', '규격', '수량', '단가', '외화금액', '공급가액', '부가세', '적요(상품)', '생산전표생성', ]
 
 
 class EcountFromSpExParser:
@@ -92,7 +92,7 @@ class EcountFromSpExParser:
         for key in ECOUNT_TITLE:
             if key in ['품목코드', '품목명', '수량', '단가', '공급가액', '부가세', '거래유형']:
                 doc.append({'품목코드': 'G샘플',
-                            '품목명': '',
+                            '품목명': self.order.goods,
                             '수량': self.order.amount,
                             '단가': 0,
                             '공급가액': 0,
