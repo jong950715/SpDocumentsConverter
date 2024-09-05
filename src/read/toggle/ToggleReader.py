@@ -4,8 +4,6 @@ import openpyxl
 from openpyxl.worksheet.worksheet import Worksheet
 
 from src.definitions import getRootDir
-
-TITLES = ['시간', '챙길것', '품목', '수량', '보험사', '지점', '주문자이름', '주소', '전화번호', '단가', '금액', '수금']
 class ToggleReader:
     def __init__(self, sheet: Worksheet):
         self.sheet = sheet

@@ -1,12 +1,20 @@
+import time
 from tkinter import Label, Button, filedialog, BooleanVar, Checkbutton, DISABLED
 from tkinter.ttk import Combobox
 
 import openpyxl
+import xlwings
+from openpyxl.worksheet.worksheet import Worksheet
 
+from src.definitions import getTempDir
 from src.write.ecount.EcountWriter import EcountWriter
+from src.write.spEx.SpExWriter import SpExWriter
 
 MAX_ROW = 5
 MAX_COL = 10
+NEW_SHEETNAME = "5A910D12"
+
+
 class ToggleGui:
     def __init__(self, root):
         self.fileName = ''
@@ -35,15 +43,15 @@ class ToggleGui:
 
         self.outChkState = {}
         for i, x in enumerate(['성풍 출고장', '이카운트']):
-            self.outChkState[x] = BooleanVar(value=False)
-            if x in ['성풍 출고장']:
+            self.outChkState[x] = BooleanVar(value=True)
+            if x in []:
                 Checkbutton(self.root, text=x, variable=self.outChkState[x], state=DISABLED).grid(column=i + 1, **_grid)
                 continue
             Checkbutton(self.root, text=x, variable=self.outChkState[x]).grid(column=i + 1, **_grid)
 
         # row3
         _grid['row'] = 3
-        self.runButton = Button(self.root, text='실행하기', command=self.run)
+        self.runButton = Button(self.root, text='현재시트로 바로 실행하기', command=self.runWithActiveSheet)
         self.runButton.grid(column=1, **_grid)
 
     def gridBackground(self):
@@ -55,7 +63,7 @@ class ToggleGui:
     def findFile(self):
         file = filedialog.askopenfile(
             title='토글 파일 선택하기',
-            filetypes=(('엑셀 파일', ('*.xlsx', '*.xls')), ('모든 파일', '*.*'))
+            filetypes=(('엑셀 파일', ('*.xlsx')), ('모든 파일', '*.*'))
         )
         self.setSpExFileName(file.name)
         return file
@@ -64,16 +72,30 @@ class ToggleGui:
         self.fileName = fileName
         self.fileNameLabel.configure(text=fileName)
         fileName = fileName.replace('/', '\\')
-        self.sheetCombobox.configure(values=openpyxl.load_workbook(fileName, read_only=True, data_only=True).sheetnames)
+        wb = openpyxl.load_workbook(fileName, read_only=True, data_only=True)
+        self.sheetCombobox.configure(values=wb.sheetnames)
 
-    def run(self):
+    def runWithActiveSheet(self):
+        currentBook = xlwings.books.active
+        currentSheet = currentBook.sheets.active
+
+        newBook = xlwings.Book()
+        currentSheet.copy(before=newBook.sheets[0], name=NEW_SHEETNAME)
+
+        newFilePathName = '{0}/{1}_{2}'.format(getTempDir(), time.strftime("%Y%m%d-%H%M%S"), currentBook.name)
+        print(newFilePathName)
+        newBook.save(newFilePathName)
+        newBook.close()
+
+        spSheet = openpyxl.load_workbook(newFilePathName, read_only=True, data_only=True)[NEW_SHEETNAME]
+        self._run(sheet=spSheet)
+
+    def _run(self, sheet: Worksheet):
         sheetName = self.sheetCombobox.get()
         Writer = {
             '이카운트': EcountWriter,
+            '성풍 출고장': SpExWriter,
         }
-        spSheet = openpyxl.load_workbook(self.fileName, read_only=True, data_only=True)[sheetName]
         for k, chk in self.outChkState.items():
             if chk.get():
-                Writer[k](spSheet).getDocsFromToggle()
-
-
+                Writer[k].fromSheet(sheet).getDocsFromToggle()

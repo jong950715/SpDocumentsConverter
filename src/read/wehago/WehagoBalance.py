@@ -94,6 +94,6 @@ class WehagoBalance:
 
 
 if __name__ == '__main__':
-    wb = openpyxl.load_workbook('거래처별 총괄잔액.xlsx', read_only=True, data_only=True)
+    wb = openpyxl.load_workbook('108잔액_0426.xlsx', read_only=True, data_only=True)
     sheet = wb[wb.active.title]
     WehagoBalance(sheet)

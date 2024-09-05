@@ -11,6 +11,13 @@ OUT_NORMAL = ['전표일자', '순번', '구분', '계정코드', '거래처코�
 OUT_INCOME = ['일자', '순번', '회계전표No.', '입금계좌코드', '계정코드', '거래처코드', '거래처명', '금액', '수수료', '적요명', ]
 
 
+def rowToDict(row) -> Dict[str, Union[str, None]]:
+    res = defaultdict(lambda: None)
+    for cell, title in zip(row, TITLES):
+        res[title] = cell.value
+    return res
+
+
 class WehagoDocument:
     def __init__(self, sh: Worksheet):
         self.companyCodeLU = self.getComCodeLU()
@@ -28,7 +35,7 @@ class WehagoDocument:
         ws_spend.append(OUT_INCOME)
 
         for row in sh.iter_rows(min_row=8):
-            row = self.rowToDict(row)
+            row = rowToDict(row)
             if row['구분'] == '대 체':
                 ws_normal.append(self.getRowNormal(row))
             elif row['구분'] == '입 금':
@@ -83,14 +90,44 @@ class WehagoDocument:
             res[row[0].value] = row[2].value
         return res
 
-    def rowToDict(self, row) -> Dict[str, Union[str, None]]:
-        res = defaultdict(lambda: None)
-        for cell, title in zip(row, self.titles):
-            res[title] = cell.value
-        return res
+
+class HanhwaMall:
+    def __init__(self, sh: Worksheet):
+        pRow = {'전표일자': 0}
+        res = []
+        tmp = []
+        flagHanhwa = False
+        for row in sh.iter_rows(min_row=8):
+            row = rowToDict(row)
+            #['전표일자', '번호', '구분', '계정코드', '계정과목명', '출금(차변)', '입금(대변)', '거래처코드', '거래처명', '적요', ]
+            if row['전표일자'] != pRow['전표일자'] or row['번호'] != pRow['번호']:
+                if flagHanhwa:
+                    res.extend(tmp)
+                tmp = []
+                flagHanhwa = False
+                pRow = row
+                tmp.append(row)
+                continue
+            if row['거래처코드'] == '009020':
+                flagHanhwa = True
+            tmp.append(row)
+            pRow = row
+
+        wb = openpyxl.Workbook()
+        newSh: Worksheet = wb.active
+        newSh.append(TITLES)
+
+        for row in res:
+            tmp = []
+            for title in TITLES:
+                tmp.append(row[title])
+            newSh.append(tmp)
+
+        wb.save(filename='{0}-{1}.xlsx'.format('Hanhwa', time.strftime("%Y%m%d-%H%M")))
 
 
 if __name__ == '__main__':
-    wb = openpyxl.load_workbook('위하고_매입매출전표_0201~0428.xlsx', read_only=True, data_only=True)
+    wb = openpyxl.load_workbook('위하고_일반전표_0201~0428.xlsx', read_only=True, data_only=True)
     sheet = wb[wb.active.title]
-    WehagoDocument(sheet)
+    HanhwaMall(sheet)
+    # WehagoDocument(sheet)

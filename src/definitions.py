@@ -2,7 +2,7 @@ import os
 from tempfile import gettempdir
 
 
-def getRootDir():
+def getRootDir() -> str:
     root_dir = os.path.dirname(os.path.abspath(__file__))
     return root_dir
 

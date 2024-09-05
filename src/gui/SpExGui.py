@@ -28,6 +28,7 @@ class SpExGui:
         self.outChkState: Dict[str, BooleanVar] = {}
         for x in outKind:
             self.outChkState[x] = BooleanVar(value=False)
+        self.outChkState['이카운트'].set(True)
 
         self._init1(root2)
         self._init2(root1)

@@ -36,7 +36,7 @@ class Order:
         self.isFree = (doesWordContainWords(row['챙길것'], FREE_WORDS)
                        or doesWordContainWords(row['보험사'], FREE_WORDS))
         # self.logisticPrice = row['배송비??']
-        self.vat = self.isVat(row['부가세'])
+        self.vat = self.isVat(row['유형'])
         # self.vat = True
 
     def toDict(self):
@@ -50,9 +50,9 @@ class Order:
         if value is None or not isinstance(value, str):
             return True  # 일단 면세로
             # return False  # 일단 면세로
-        if value in ['O', 'o', '과세']:
+        if value in ['O', 'o', '과세', '과']:
             return True
-        elif value in ['X', 'x', '면세']:
+        elif value in ['X', 'x', '면세', '면']:
             return False
         else:
             pass  # TODO: 에러처리!
@@ -78,7 +78,7 @@ class Order:
         return True
 
 
-DUMMY_ROW = {'우': '향', '시간': '17.중', '챙길것': '보자기XXX', '품목': '대추방울토마토3kg(4팩) ', '수량': 1, '보험사': '#부록,명세完',
+DUMMY_ROW = {'우': '향', '시간': '17.중', '챙길것': '보자기XXX', '품목': '대추방울토마토3kg(4팩) ', '수량': 1,'유형': '과', '보험사': '#부록,명세完',
              '지점': '명륜지점#409', '주문자이름': 'dummy', '주소': '서울시 동대문구 천호대로 429(장안동)  대성타워 3층 <한화 명륜지점>',
              '전화번호': '010-3156-4537', '단가': 35000, '금액': 35000, '수금': None, '부가세': None}
 DUMMY_ORDER = Order(identifier=DUMMY_IDENTIFIER, customer=DUMMY_CUSTOMER, sender=DUMMY_SENDER, receiver=DUMMY_RECEIVER,

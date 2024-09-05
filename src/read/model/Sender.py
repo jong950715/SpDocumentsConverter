@@ -21,13 +21,12 @@ class Sender:
                 '보내는분-전화번호': self.phone}
 
     def verifyRow(self, row):
-        if (isinstance(row['단가'], (int, float))
-                and isinstance(row['금액'], (int, float))
-                and isinstance(row['수량'], (int, float))):
-            return False
-        if not isinstance(row['품목'], str):
-            return False
-        if '보내는분' not in row['품목'] and '보내는 분' not in row['품목']:
+        # if (isinstance(row['단가'], (int, float))
+        #         and isinstance(row['금액'], (int, float))
+        #         and isinstance(row['수량'], (int, float))):
+        #     return False
+        if ( (not isinstance(row['품목'], str) or ('보내는분' not in row['품목'] and '보내는  분' not in row['품목']) )
+                and (not isinstance(row['챙길것'], str) or ('보내는분' not in row['챙길것'] and '보내는  분' not in row['챙길것']) ) ):
             return False
         if not isString(row['주문자이름']):
             return False
@@ -37,7 +36,7 @@ class Sender:
     def getByIdentifier(cls, identifier: str):
         if "배송" in identifier:
             return Sender(
-                name="성풍물산",
+                name="",
                 address="동호로",
                 phone="010-0000-0000",
             )
@@ -56,7 +55,7 @@ class Sender:
             )
         elif "택배" in identifier:
             return Sender(
-                name="성풍물산",
+                name="",
                 address="동호로",
                 phone="010-0000-0000",
             )

@@ -10,7 +10,7 @@ from src.definitions import getTempDir
 from src.read.SpExReader import SpExReader
 from src.read.model.Order import DUMMY_ORDER, Order
 from src.read.toggle.ToggleReader import ToggleReader
-from src.write.ecount.EcountFromSpExParser import EcountFromSpExParser, ECOUNT_TITLE
+from src.write.ecount.EcountFromSpExParser import EcountFromSpExParser, ECOUNT_TITLE, SELF_USE_TITLE
 from src.write.ecount.EcountFromToggleParser import EcountFromToggleParser
 
 
@@ -37,19 +37,32 @@ class EcountWriter:
         res = []
         # prevOrder = DUMMY_ORDER
         orderIdx = 0
-        for o in orders:
+        for o in filter(lambda _o: not _o.isFree, orders):
             orderIdx += 1  # 같은거래 묶어야 될 수도 있어서 enumerate 안씀.
             # orderIdx = orderIdx + 1 if prevOrder.customer.nameAndCode != o.customer.nameAndCode else orderIdx
             documents = EcountFromSpExParser(o, orderIdx).getDocumentsOfOrder()
             [res.append(doc) for doc in documents]
             # prevOrder = o
 
+        resSelfUse = []
+        for o in filter(lambda _o: _o.isFree, orders):
+            orderIdx += 1  # 같은거래 묶어야 될 수도 있어서 enumerate 안씀.
+            doc = EcountFromSpExParser(o, orderIdx).getFreeDocByTitleSelfUse()
+            resSelfUse.append(doc)
+
+
         wb = openpyxl.Workbook()
         ws = wb.active
-        ecountDocuments = ws
-        ecountDocuments.append(ECOUNT_TITLE)
+        ecountDocument = ws
+        selfUseDocument = wb.create_sheet('자가사용')
+        ecountDocument.append(ECOUNT_TITLE)
         for x in res[::-1]:
-            ecountDocuments.append(x)
+            ecountDocument.append(x)
+
+
+        selfUseDocument.append(SELF_USE_TITLE)
+        for x in resSelfUse:
+            selfUseDocument.append(x)
 
         filePath = '{0}/{1}-{2}.xlsx'.format(getTempDir(), 'EcountWriter', time.strftime("%Y%m%d-%H%M%S"))
         wb.save(filePath)  # 같은이름 있는지 확인
@@ -77,6 +90,7 @@ class EcountWriter:
             prevOrder = o
         else:
             ecountDocuments.append(_parser.getShippingDoc())
+
 
         filePath = '{0}/{1}-{2}.xlsx'.format(getTempDir(), 'EcountWriter', time.strftime("%Y%m%d-%H%M"))
         wb.save(filePath)  # 같은이름 있는지 확인

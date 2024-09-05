@@ -63,7 +63,10 @@ class SpExReader:
     def __init__(self, it: iter):
         row = []
         while not isTitleRow(row):
-            row = it.__next__()
+            try:
+                row = it.__next__()
+            except StopIteration:
+                return None
         self.titles = onlyKCharacter(row)
         self.it = it
 
