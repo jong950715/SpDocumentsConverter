@@ -1,21 +1,15 @@
 import re
-from copy import deepcopy
 from datetime import datetime
-
 from typing import List, Dict, Union
-
-import openpyxl
 
 from src.read.toggle.toggleLU import SOO_PACKAGE_FEE, ToggleLU
 from src.read.toggle.ToggleReader import ToggleReader
 
-ECOUNT_TITLE = ['일자', '순번', '거래처코드', '거래처명', '담당자', '이름', '주소', '전화번호', '이름(보내는 분)', '주소(보내는 분)', '전화번호(보내는 분)', '거래유형',
-                '적요', '우-메모', '품목코드', '품목명', '규격', '수량', '단가', '외화금액', '공급가액', '부가세', '적요(상품)', '생산전표생성', ]
+WEHAGO_TITLE = ['년도', '월', '일', '매입매출구분(1 - 매출 / 2 - 매입)', '과세유형', '불공제사유', '신용카드거래처코드', '신용카드사명', '신용카드(가맹점)번호',
+                '거래처명', '사업자(주민)등록번호', '공급가액', '부가세', '품명', '전자세금(1.전자)', '기본계정', '상대계정', '현금영수증 승인번호']
 
 
-
-
-class EcountFromToggleParser:
+class WehagoFromToggleParser:
     toggleLU = ToggleLU()
     styles = toggleLU.getStyles()
     sooLU = toggleLU.sooLU
@@ -62,29 +56,30 @@ class EcountFromToggleParser:
         return item
 
     def _getitem_(self, key):
-        # ECOUNT_TITLE = ['일자', '순번', '거래처코드', '거래처명', '담당자', '이름', '주소', '전화번호', '이름(보내는 분)', '주소(보내는 분)', '전화번호(보내는 분)',
-        #                 '거래유형', '적요', '품목코드', '품목명', '규격', '수량', '단가', '외화금액', '공급가액', '부가세', '적요', '생산전표생성', ]
+        # WEHAGO_TITLE = ['년도', '월', '일', '매입매출구분(1 - 매출 / 2 - 매입)', '과세유형', '불공제사유', '신용카드거래처코드', '신용카드사명',
+        #                 '신용카드(가맹점)번호',
+        #                 '거래처명', '사업자(주민)등록번호', '공급가액', '부가세', '품명', '전자세금(1.전자)', '기본계정', '상대계정', '현금영수증 승인번호']
 
-        if key == '일자':
-            # return datetime.strptime(self.order['발송일'][0:10], '%Y.%M.%d').strftime('%Y-%M-%d')
-            return self.order['발송일'][0:10] if self.order['발송일'] is not None else datetime.now().strftime('%Y-%m-%d')
-        if key == '순번':
-            return self.idx
-        if key == '거래처코드':
-            return 'C1691' if self.order['쇼핑몰'] == '수건어물' else "C5002" if self.order['쇼핑몰'] == '행복앤미소' else None
-        if key == '거래처명':
-            return '수건어물' if self.order['쇼핑몰'] == '수건어물' else '행복앤미소' if self.order['쇼핑몰'] == '행복앤미소' else None
-        if key in ['이름', '주소', '전화번호', '이름(보내는 분)', '주소(보내는 분)', '전화번호(보내는 분)']:
-            return {'이름': self.order['수취인명'],
-                    '주소': self.order['통합배송지'],
-                    '전화번호': self.order['수취인연락처1'],
-                    '이름(보내는 분)': self.order['구매자명'],
-                    '주소(보내는 분)': '',
-                    '전화번호(보내는 분)': self.order['구매자연락처'],
+        # if key == '년도':
+        #     return self.order['발송일'][0:10] if self.order['발송일'] is not None else datetime.now().strftime('%Y-%M-%d')
+        if key == '년도':
+            return self.order['발송일'][0:4] if self.order['발송일'] is not None else datetime.now().strftime('%Y')
+        if key == '월':
+            return self.order['발송일'][5:7] if self.order['발송일'] is not None else datetime.now().strftime('%m')
+        if key == '일':
+            return self.order['발송일'][8:10] if self.order['발송일'] is not None else datetime.now().strftime('%d')
+        if key == '매입매출구분(1 - 매출 / 2 - 매입)':
+            return 1
+        if key == '과세유형':
+            return 13
+        if key == '사업자(주민)등록번호':
+            return '001691-0000000' if self.order['쇼핑몰'] == '수건어물' else "005002-0000000" if self.order[
+                                                                                                '쇼핑몰'] == '행복앤미소' else None
+        if key in ['공급가액', '부가세']:
+            return {'공급가액': self.unitPrice * self.order['수량'],
+                    '부가세': None,
                     }[key]
-        if key == '거래유형':
-            return 12  # 면세
-        if key in ['적요(상품)', '적요']:
+        if key in ['품명']:
             isSameSenderReceiver = self.order['구매자명'] == self.order['수취인명']
             # if self.order.sender.name in ['성풍물산', '수건어물']:
             return ('{0} {1} x \{2}'.format(self.goodsName,
@@ -94,14 +89,47 @@ class EcountFromToggleParser:
                     (' {0}'.format(self.order['수취인명']) if isSameSenderReceiver else
                      ' {0} -> {1}'.format(self.order['구매자명'], self.order['수취인명']))
                     )
-        if key in ['품목코드', '품목명', '수량', '단가', '공급가액', '부가세']:
-            return {'품목코드': 'G{0}'.format(self.goodsCode),
-                    '품목명': self.goodsName,
-                    '수량': self.order['수량'],
-                    '단가': self.unitPrice,
-                    '공급가액': self.unitPrice * self.order['수량'],
-                    '부가세': 0,
-                    }[key]
+
+        if key in ['기본계정', '상대계정']:
+            return {
+                '기본계정': 401,
+                '상대계정': 108,
+            }[key]
+
+        # if key == '순번':
+        #     return self.idx
+        # if key == '거래처코드':
+        #     return 'C1691' if self.order['쇼핑몰'] == '수건어물' else "C5002" if self.order['쇼핑몰'] == '행복앤미소' else None
+        # if key == '거래처명':
+        #     return '수건어물' if self.order['쇼핑몰'] == '수건어물' else '행복앤미소' if self.order['쇼핑몰'] == '행복앤미소' else None
+        # if key in ['이름', '주소', '전화번호', '이름(보내는 분)', '주소(보내는 분)', '전화번호(보내는 분)']:
+        #     return {'이름': self.order['수취인명'],
+        #             '주소': self.order['통합배송지'],
+        #             '전화번호': self.order['수취인연락처1'],
+        #             '이름(보내는 분)': self.order['구매자명'],
+        #             '주소(보내는 분)': '',
+        #             '전화번호(보내는 분)': self.order['구매자연락처'],
+        #             }[key]
+        # if key == '거래유형':
+        #     return 12  # 면세
+        # if key in ['적요(상품)', '적요']:
+        #     isSameSenderReceiver = self.order['구매자명'] == self.order['수취인명']
+        #     # if self.order.sender.name in ['성풍물산', '수건어물']:
+        #     return ('{0} {1} x \{2}'.format(self.goodsName,
+        #                                     self.order['수량'],
+        #                                     format(int(self.unitPrice), ','),
+        #                                     ) +
+        #             (' {0}'.format(self.order['수취인명']) if isSameSenderReceiver else
+        #              ' {0} -> {1}'.format(self.order['구매자명'], self.order['수취인명']))
+        #             )
+        # if key in ['품목코드', '품목명', '수량', '단가', '공급가액', '부가세']:
+        #     return {'품목코드': 'G{0}'.format(self.goodsCode),
+        #             '품목명': self.goodsName,
+        #             '수량': self.order['수량'],
+        #             '단가': self.unitPrice,
+        #             '공급가액': self.unitPrice * self.order['수량'],
+        #             '부가세': 0,
+        #             }[key]
 
     def getDocumentsOfOrder(self) -> List[List]:
         return [self.getDocByTitle()]
@@ -112,13 +140,13 @@ class EcountFromToggleParser:
 
     def getDocByTitle(self) -> List:
         doc = []
-        for key in ECOUNT_TITLE:
+        for key in WEHAGO_TITLE:
             doc.append(self[key])
         return doc
 
     def getShippingDoc(self) -> List:
         doc = []
-        for key in ECOUNT_TITLE:
+        for key in WEHAGO_TITLE:
             doc.append(self.getShippingEntry(key))
         return doc
 
@@ -140,7 +168,7 @@ class EcountFromToggleParser:
 
     # def getFreeDocByTitle(self) -> List:
     #     doc = []
-    #     for key in ECOUNT_TITLE:
+    #     for key in WEHAGO_TITLE:
     #         if key in ['품목코드', '품목명', '수량', '단가', '공급가액', '부가세']:
     #             doc.append(self.getFreeDocEntry(key))
     #             continue
@@ -158,7 +186,7 @@ class EcountFromToggleParser:
     #                 }[key]
     # def getFreeDoc(self) -> List:
     #     doc = []
-    #     for key in ECOUNT_TITLE:
+    #     for key in WEHAGO_TITLE:
     #         if key in ['거래일(예:2018-01-01)', '구분', '코드', '거래처명', '유형', '적요', '결제장부', '거래금액']:
     #             doc.append(None)
     #             continue
@@ -175,5 +203,5 @@ class EcountFromToggleParser:
 if __name__ == '__main__':
     toggleReader = ToggleReader.fromFileName('{0}/../TOGLE_출고내역서_수건어물_20240424_225939.xlsx'.format(getRootDir()))
     orders = toggleReader.getOrders()
-    orw = EcountFromToggleParser(orders[0], 1)
+    orw = WehagoFromToggleParser(orders[0], 1)
     print(orw['품목명'])

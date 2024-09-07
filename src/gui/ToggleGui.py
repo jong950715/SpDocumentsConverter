@@ -9,6 +9,7 @@ from openpyxl.worksheet.worksheet import Worksheet
 from src.definitions import getTempDir
 from src.write.ecount.EcountWriter import EcountWriter
 from src.write.spEx.SpExWriter import SpExWriter
+from src.write.wehago.WehagoWriter import WehagoWriter
 
 MAX_ROW = 5
 MAX_COL = 10
@@ -42,7 +43,7 @@ class ToggleGui:
         Label(self.root, text='출력선택').grid(column=0, rowspan=2, **_grid)
 
         self.outChkState = {}
-        for i, x in enumerate(['성풍 출고장', '이카운트']):
+        for i, x in enumerate(['성풍 출고장', '이카운트', '위하고']):
             self.outChkState[x] = BooleanVar(value=True)
             if x in []:
                 Checkbutton(self.root, text=x, variable=self.outChkState[x], state=DISABLED).grid(column=i + 1, **_grid)
@@ -95,6 +96,7 @@ class ToggleGui:
         Writer = {
             '이카운트': EcountWriter,
             '성풍 출고장': SpExWriter,
+            '위하고': WehagoWriter,
         }
         for k, chk in self.outChkState.items():
             if chk.get():
