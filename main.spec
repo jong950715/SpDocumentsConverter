@@ -1,11 +1,33 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+from pathlib import Path
+import platform
+import struct
+import sys
+
+if sys.platform not in ('darwin', 'win32'):
+    raise SystemExit('Build on Apple Silicon macOS or AMD64 Windows.')
+if sys.platform == 'win32' and (struct.calcsize('P') != 8 or platform.machine().lower() not in ('amd64', 'x86_64')):
+    raise SystemExit('Use AMD64 (64-bit) Python to build the Windows application.')
+
+try:
+    import tkinter
+except ImportError as exc:
+    raise SystemExit(
+        'Tcl/Tk is required to build the GUI. On Homebrew Python 3.14, run '
+        'brew install python-tk@3.14. On Windows, install Python with Tcl/Tk support.'
+    ) from exc
+
+root = Path(SPECPATH)
+is_macos = sys.platform == 'darwin'
+app_name = 'SpDocumentsConverter'
 
 a = Analysis(
-    ['main.py'],
-    pathex=[],
+    [str(root / 'main.py')],
+    pathex=[str(root)],
     binaries=[],
-    datas=[('./src/read/toggle/수건어물LU.xlsx', './src/read/toggle'), ('./src/read/toggle/행복앤미소LU.xlsx', './src/read/toggle')],
+    datas=[(str(root / 'src/read/toggle' / name), 'src/read/toggle')
+           for name in ('수건어물LU.xlsx', '행복앤미소LU.xlsx')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -21,24 +43,35 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='main',
+    name=app_name,
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,
-    console=True,
+    upx=False,
+    console=not is_macos,
     disable_windowed_traceback=False,
     argv_emulation=False,
-    target_arch=None,
+    target_arch='arm64' if is_macos else None,
     codesign_identity=None,
-    entitlements_file=None,
+    entitlements_file=str(root / 'packaging/macos-entitlements.plist') if is_macos else None,
 )
 coll = COLLECT(
     exe,
     a.binaries,
     a.datas,
     strip=False,
-    upx=True,
+    upx=False,
     upx_exclude=[],
-    name='main',
+    name=app_name,
 )
+
+if is_macos:
+    app = BUNDLE(
+        coll,
+        name=app_name + '.app',
+        bundle_identifier='com.mirstream.spdocumentsconverter',
+        info_plist={
+            'NSHighResolutionCapable': True,
+            'NSAppleEventsUsageDescription': '열려 있는 Excel 문서의 시트와 선택 영역을 읽어 변환합니다.',
+        },
+    )

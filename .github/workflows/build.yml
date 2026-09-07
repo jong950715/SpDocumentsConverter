@@ -1,0 +1,67 @@
+name: Windows and macOS
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2022
+            architecture: x64
+            artifact: windows-x64
+          - os: macos-15
+            architecture: arm64
+            artifact: macos-arm64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.14'
+          architecture: ${{ matrix.architecture }}
+          cache: pip
+          cache-dependency-path: requirements*.txt
+      - run: python -m pip install -r requirements-build.txt
+      - run: python -m unittest discover -s tests -v
+      - run: python main.py --smoke-test
+      - run: python -m PyInstaller --noconfirm main.spec
+      - name: Check packaged GUI and resources outside the repository
+        shell: python
+        run: |
+          from pathlib import Path
+          import subprocess
+          import sys
+          import tempfile
+          if sys.platform == 'darwin':
+              executable = Path('dist/SpDocumentsConverter.app/Contents/MacOS/SpDocumentsConverter')
+          else:
+              executable = Path('dist/SpDocumentsConverter/SpDocumentsConverter.exe')
+          subprocess.run([str(executable.resolve()), '--smoke-test'],
+                         cwd=tempfile.gettempdir(), check=True, timeout=30)
+      - name: Archive application
+        shell: python
+        run: |
+          import shutil
+          import subprocess
+          import sys
+          if sys.platform == 'darwin':
+              subprocess.run(['/usr/bin/ditto', '-c', '-k', '--sequesterRsrc', '--keepParent',
+                              'dist/SpDocumentsConverter.app',
+                              'dist/SpDocumentsConverter-macos-arm64.zip'], check=True)
+          else:
+              shutil.make_archive('dist/SpDocumentsConverter-windows-x64', 'zip',
+                                  'dist', 'SpDocumentsConverter')
+      - uses: actions/upload-artifact@v7
+        with:
+          name: SpDocumentsConverter-${{ matrix.artifact }}
+          path: dist/*.zip
+          if-no-files-found: error

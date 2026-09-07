@@ -1,4 +1,3 @@
-import os
 import time
 from datetime import datetime
 from itertools import filterfalse
@@ -9,6 +8,7 @@ from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 from openpyxl.worksheet.worksheet import Worksheet
 
 from src.definitions import getTempDir
+from src.platform_utils import open_file
 from src.read.toggle.ToggleReader import ToggleReader
 from src.read.toggle.toggleLU import ToggleLU
 from src.write.spEx.SpExFromToggleParser import SpExFromToggleParser, SPEX_TITLES
@@ -124,4 +124,4 @@ class SpExWriter:
 
         filePath = '{0}/{1}-{2}.xlsx'.format(getTempDir(), 'SpExWriter', time.strftime("%Y%m%d-%H%M"))
         wb.save(filePath)  # 같은이름 있는지 확인
-        os.startfile(filePath)
+        open_file(filePath)

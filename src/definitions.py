@@ -1,14 +1,13 @@
-import os
+from pathlib import Path
 from tempfile import gettempdir
 
 
 def getRootDir() -> str:
-    root_dir = os.path.dirname(os.path.abspath(__file__))
-    return root_dir
+    return str(Path(__file__).resolve().parent)
 
 
 def getTempDir():
-    return gettempdir().replace('\\\\', '/').replace('\\','/')
+    return gettempdir()
 
 
 def main():

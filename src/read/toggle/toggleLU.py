@@ -1,6 +1,7 @@
 import re
 from collections import defaultdict
 from copy import copy
+from pathlib import Path
 from typing import Dict, Union, List, Iterable
 
 import openpyxl
@@ -9,8 +10,8 @@ from openpyxl.worksheet.worksheet import Worksheet
 
 from src.definitions import getRootDir
 
-SOO_LU_FILE_PATH = '{0}/read/toggle/수건어물LU.xlsx'.format(getRootDir().replace('\\\\', '/').replace('\\', '/'))
-HAPPY_LU_FILE_PATH = '{0}/read/toggle/행복앤미소LU.xlsx'.format(getRootDir().replace('\\\\', '/').replace('\\', '/'))
+SOO_LU_FILE_PATH = Path(getRootDir()) / 'read' / 'toggle' / '수건어물LU.xlsx'
+HAPPY_LU_FILE_PATH = Path(getRootDir()) / 'read' / 'toggle' / '행복앤미소LU.xlsx'
 TITLES = [None, '네이버기준품목명', None, '출고지시서품목명', '납품단가', '납품수량', '유형']
 SOO_PACKAGE_FEE = 600
 

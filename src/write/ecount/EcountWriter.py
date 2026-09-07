@@ -1,4 +1,3 @@
-import os
 import time
 from collections import defaultdict
 from typing import Dict, List
@@ -7,6 +6,7 @@ import openpyxl
 from openpyxl.worksheet.worksheet import Worksheet
 
 from src.definitions import getTempDir
+from src.platform_utils import open_file
 from src.read.SpExReader import SpExReader
 from src.read.model.Order import DUMMY_ORDER, Order
 from src.read.toggle.ToggleReader import ToggleReader
@@ -66,7 +66,7 @@ class EcountWriter:
 
         filePath = '{0}/{1}-{2}.xlsx'.format(getTempDir(), 'EcountWriter', time.strftime("%Y%m%d-%H%M%S"))
         wb.save(filePath)  # 같은이름 있는지 확인
-        os.startfile(filePath)
+        open_file(filePath)
 
     def getDocsFromToggle(self):
         orders: List[Dict] = self.toggleReader.getOrders()
@@ -94,7 +94,7 @@ class EcountWriter:
 
         filePath = '{0}/{1}-{2}.xlsx'.format(getTempDir(), 'EcountWriter', time.strftime("%Y%m%d-%H%M"))
         wb.save(filePath)  # 같은이름 있는지 확인
-        os.startfile(filePath)
+        open_file(filePath)
 
 
 if __name__ == '__main__':

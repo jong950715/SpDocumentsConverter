@@ -1,19 +1,15 @@
-import time
 from tkinter import Label, Button, filedialog, BooleanVar, Checkbutton, DISABLED
 from tkinter.ttk import Combobox
 
-import openpyxl
-import xlwings
 from openpyxl.worksheet.worksheet import Worksheet
 
-from src.definitions import getTempDir
+from src.excel_access import active_sheet, sheet_names
 from src.write.ecount.EcountWriter import EcountWriter
 from src.write.spEx.SpExWriter import SpExWriter
 from src.write.wehago.WehagoWriter import WehagoWriter
 
 MAX_ROW = 5
 MAX_COL = 10
-NEW_SHEETNAME = "5A910D12"
 
 
 class ToggleGui:
@@ -62,37 +58,24 @@ class ToggleGui:
             Label(self.root, width=5).grid(row=0, column=col)
 
     def findFile(self):
-        file = filedialog.askopenfile(
+        path = filedialog.askopenfilename(
             title='토글 파일 선택하기',
-            filetypes=(('엑셀 파일', ('*.xlsx')), ('모든 파일', '*.*'))
+            filetypes=(('엑셀 파일', ('*.xlsx',)), ('모든 파일', '*.*'))
         )
-        self.setSpExFileName(file.name)
-        return file
+        if path:
+            self.setSpExFileName(path)
 
     def setSpExFileName(self, fileName: str):
+        names = sheet_names(fileName)
         self.fileName = fileName
         self.fileNameLabel.configure(text=fileName)
-        fileName = fileName.replace('/', '\\')
-        wb = openpyxl.load_workbook(fileName, read_only=True, data_only=True)
-        self.sheetCombobox.configure(values=wb.sheetnames)
+        self.sheetCombobox.configure(values=names)
 
     def runWithActiveSheet(self):
-        currentBook = xlwings.books.active
-        currentSheet = currentBook.sheets.active
-
-        newBook = xlwings.Book()
-        currentSheet.copy(before=newBook.sheets[0], name=NEW_SHEETNAME)
-
-        newFilePathName = '{0}/{1}_{2}'.format(getTempDir(), time.strftime("%Y%m%d-%H%M%S"), currentBook.name)
-        print(newFilePathName)
-        newBook.save(newFilePathName)
-        newBook.close()
-
-        spSheet = openpyxl.load_workbook(newFilePathName, read_only=True, data_only=True)[NEW_SHEETNAME]
-        self._run(sheet=spSheet)
+        with active_sheet() as sheet:
+            self._run(sheet=sheet)
 
     def _run(self, sheet: Worksheet):
-        sheetName = self.sheetCombobox.get()
         Writer = {
             '이카운트': EcountWriter,
             '성풍 출고장': SpExWriter,

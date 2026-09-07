@@ -1,9 +1,7 @@
-import os
+import logging
 import sys
-from tkinter import Tk, Toplevel, Frame
+from tkinter import Tk, Frame, messagebox
 from tkinter.ttk import Notebook
-
-import xlwings
 
 from src.gui.SpExGui import SpExGui
 from src.gui.ToggleGui import ToggleGui
@@ -17,6 +15,9 @@ outKind = ['위하고', '이카운트', '얼마에요', 'CJ택배송장']
 class MyGui:
     def __init__(self):
         self.root = Tk()
+        if sys.platform == 'darwin':
+            # A Finder-launched app has no console for Tk's default error report.
+            self.root.report_callback_exception = self.report_callback_exception
         # self.toggleRoot = Toplevel(self.root)
 
         notebook = Notebook(self.root, width=800, height=500)
@@ -32,9 +33,13 @@ class MyGui:
         SpExGui(tab1, tab2)
         ToggleGui(tab3)
 
+    def run(self):
         self.root.mainloop()
+
+    def report_callback_exception(self, exc_type, value, traceback):
+        logging.getLogger(__name__).error('Conversion failed', exc_info=(exc_type, value, traceback))
+        messagebox.showerror('작업을 완료하지 못했습니다', str(value), parent=self.root)
 
 
 if __name__ == '__main__':
-    myGui = MyGui()
-    os.system('pause')
+    MyGui().run()

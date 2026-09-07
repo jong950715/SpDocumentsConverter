@@ -1,21 +1,15 @@
-import shutil
-import time
-from tkinter import Tk, Label, Button, filedialog, BooleanVar, StringVar, DISABLED, Frame
+from tkinter import Label, Button, filedialog, BooleanVar, DISABLED, Frame
 from tkinter.ttk import Combobox, Checkbutton
 from typing import Dict, List, Union
 
-import openpyxl
-import xlwings
 from openpyxl.worksheet.worksheet import Worksheet
 
-from src.definitions import getTempDir
+from src.excel_access import active_sheet, open_sheet, selected_range, sheet_names
 from src.write.ecount.EcountWriter import EcountWriter
-from src.write.howmuch.HowWriter import HowWriter
 from src.write.wehago.WehagoWriter import WehagoWriter
 
 inKind = ['성풍 출고장', '토글(네이버)']
 outKind = ['위하고', '이카운트', '얼마에요', 'CJ택배송장']
-NEW_SHEETNAME = "5A910D12"
 
 
 class SpExGui:
@@ -88,50 +82,34 @@ class SpExGui:
         self.runWithSelectedRangeButton.grid(column=2, **_grid)
 
     def findFile(self):
-        self.fileNameLabel.config(text="파일 선택중")
-
-        file = filedialog.askopenfile(
+        self.fileNameLabel.config(text='파일 선택중')
+        path = filedialog.askopenfilename(
             title='출고 파일 선택하기',
             filetypes=(('엑셀 파일', ('*.xlsx', '*.xls')), ('모든 파일', '*.*'))
         )
-
-        filePathName = file.name
-
-        self.setSpExFileName(filePathName)
-        self.fileNameLabel.config(text="파일 찾기")
-
-        return file
+        if path:
+            self.setSpExFileName(path)
+            self.fileNameLabel.config(text='파일 찾기')
+        else:
+            self.fileNameLabel.config(text=self.spExFile)
 
     def setSpExFileName(self, filePathName: str):
+        names = sheet_names(filePathName)
         self.spExFile = filePathName
         self.fileNameLabel.configure(text=filePathName)
-        filePathName = filePathName.replace('/', '\\')
-        self.sheetCombobox.configure(
-            values=openpyxl.load_workbook(filePathName, read_only=True, data_only=True).sheetnames)
+        self.sheetCombobox.configure(values=names)
 
     def runWithActiveSheet(self):
-        currentBook = xlwings.books.active
-        currentSheet = currentBook.sheets.active
-
-        newBook = xlwings.Book()
-        currentSheet.copy(before=newBook.sheets[0], name=NEW_SHEETNAME)
-
-        newFilePathName = '{0}/{1}_{2}'.format(getTempDir(), time.strftime("%Y%m%d-%H%M%S"), currentBook.name)
-        print(newFilePathName)
-        newBook.save(newFilePathName)
-
-        spSheet = openpyxl.load_workbook(newFilePathName, read_only=True, data_only=True)[NEW_SHEETNAME]
-        self._run(self.runWithActiveSheetButton, sheet=spSheet)
+        with active_sheet() as sheet:
+            self._run(self.runWithActiveSheetButton, sheet=sheet)
 
     def runWithSelectedRange(self):
-        datas: List[list] = [xlwings.books.active.sheets.active.range('TITLES').value]
-        datas.extend(xlwings.books.active.app.selection.value)
-        self._run(self.runWithSelectedRangeButton, datas=datas)
+        self._run(self.runWithSelectedRangeButton, datas=selected_range())
 
     def runWithSelectedSheet(self):
         sheetName = self.sheetCombobox.get()
-        spSheet = openpyxl.load_workbook(self.spExFile, read_only=True, data_only=True)[sheetName]
-        self._run(self.runWithSelectedSheetButton, sheet=spSheet)
+        with open_sheet(self.spExFile, sheetName) as sheet:
+            self._run(self.runWithSelectedSheetButton, sheet=sheet)
 
     def _run(self, button: Button, sheet: Worksheet = None, datas: List[List] = None):
         button.config(text='실행중 입니다.')
@@ -152,7 +130,3 @@ class SpExGui:
                     Writer[k].fromDatas(datas).getDocsFromSpEx()
 
         button.config(text='완료되었습니다.')
-
-
-if __name__ == '__main__':
-    spExGui = SpExGui()
