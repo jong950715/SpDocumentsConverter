@@ -21,6 +21,9 @@ except ImportError as exc:
 root = Path(SPECPATH)
 is_macos = sys.platform == 'darwin'
 app_name = 'SpDocumentsConverter'
+if is_macos:
+    import runpy
+    macos_compat = runpy.run_path(str(root / 'packaging/check_macos_bundle.py'))
 
 a = Analysis(
     [str(root / 'main.py')],
@@ -71,7 +74,9 @@ if is_macos:
         name=app_name + '.app',
         bundle_identifier='com.mirstream.spdocumentsconverter',
         info_plist={
+            'LSMinimumSystemVersion': macos_compat['MIN_MACOS_VERSION'],
             'NSHighResolutionCapable': True,
             'NSAppleEventsUsageDescription': '열려 있는 Excel 문서의 시트와 선택 영역을 읽어 변환합니다.',
         },
     )
+    macos_compat['check_bundle'](app.name)

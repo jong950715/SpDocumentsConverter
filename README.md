@@ -1,7 +1,7 @@
 # SpDocumentsConverter
 
 성풍 출고장과 토글 주문을 이카운트·위하고 등의 Excel 업로드 양식으로 변환하는 데스크톱 프로그램입니다.
-AMD64 Windows와 Apple Silicon Mac을 대상으로 같은 소스와 PyInstaller 설정을 사용합니다.
+AMD64 Windows와 **macOS Sequoia 15.5 이상인 Apple Silicon Mac**을 대상으로 같은 소스와 PyInstaller 설정을 사용합니다.
 이 브랜치는 기존 화면, 기능, 입출력 및 변환 규칙을 유지하면서 운영체제 호환성을 정리합니다.
 
 ## 실행 환경
@@ -25,7 +25,16 @@ py -3.14 -m venv .venv
 .venv\Scripts\python main.py
 ```
 
-Apple Silicon Mac에서 Homebrew Python을 사용하는 경우:
+Mac 배포 빌드에는 [python.org의 Python 3.14 macOS 설치본](https://www.python.org/downloads/macos/)처럼
+15.5 이하를 지원하는 Python과 Tcl/Tk를 사용합니다. 공식 설치본에는 Tcl/Tk가 포함됩니다.
+
+```sh
+/Library/Frameworks/Python.framework/Versions/3.14/bin/python3.14 -m venv .venv
+.venv/bin/python -m pip install -r requirements-build.txt
+.venv/bin/python main.py
+```
+
+Homebrew Python을 사용하는 로컬 개발 환경은 다음과 같이 준비할 수 있습니다:
 
 ```sh
 brew install python@3.14 python-tk@3.14
@@ -36,6 +45,7 @@ python3.14 -m venv .venv
 
 `python -m tkinter`로 Tcl/Tk 설치를 확인할 수 있습니다.
 아래 명령의 `python`은 위에서 준비한 `.venv`의 Python을 사용합니다.
+Python 설치본을 바꿀 때는 기존 가상환경을 재사용하지 않고 새로 만듭니다.
 
 ## 사용
 
@@ -59,13 +69,21 @@ python -m PyInstaller --noconfirm main.spec
 
 - AMD64 Windows 결과: `dist/SpDocumentsConverter/SpDocumentsConverter.exe`.
   배포할 때는 같은 폴더의 `_internal` 등도 함께 전달합니다.
-- Mac 결과: `dist/SpDocumentsConverter.app` (arm64).
+- Mac 결과: `dist/SpDocumentsConverter.app` (arm64, 최소 macOS 15.5).
   Tcl/Tk 및 품목 조회표 두 개가 포함되며 Excel 자동화 권한 설명도 설정됩니다.
 - 빌드는 각 운영체제에서 실행합니다. Windows에서 Mac 앱을 빌드하거나 반대로 빌드하지 않습니다.
 - Python과 라이브러리는 결과물에 포함되므로 배포받는 사람은 별도로 설치하지 않아도 됩니다.
   현재 시트 / 선택 영역 기능을 쓰는 사람에게는 Microsoft Excel이 필요합니다.
 
 GitHub Actions는 Windows x64와 Mac arm64에서 회귀 테스트, GUI 시작 검사, 빌드 및 패키징 후 시작 검사를 수행하도록 구성되어 있습니다.
+Mac 빌드는 `macos-15` 러너에서 수행하며, 앱의 최소 버전을 15.5로 선언합니다.
+빌드가 끝날 때 앱에 포함된 모든 Mach-O 파일의 아키텍처와 최소 OS를 검사하고,
+15.5보다 새 OS를 요구하는 라이브러리가 있으면 빌드를 실패시킵니다.
+현재 OS를 대상으로 컴파일한 Homebrew Python/Tk가 원인이 될 수 있습니다.
+`MACOSX_DEPLOYMENT_TARGET=15.5`나 `Info.plist` 설정만으로 이미 컴파일된 라이브러리의 호환성을 낮출 수는 없습니다.
+
+러너의 `macos-15` 라벨은 정확히 15.5를 고정하지 않습니다. 위 검사는 바이너리에 선언된 최소 버전을 확인하며,
+실제 배포 검증에는 macOS 15.5에서 GUI 시작, Excel 현재 시트·선택 영역 변환, 결과 파일 열기도 포함합니다.
 Mac 배포 압축에는 `.app`의 실행 권한과 심볼릭 링크를 보존합니다. Developer ID 서명·공증은 이 설정에 포함하지 않습니다.
 
 자동 테스트는 Excel을 제어하지 않습니다. 실제 Excel에서 현재 시트 복사, 선택 영역 읽기,
@@ -76,3 +94,4 @@ Mac 배포 압축에는 `.app`의 실행 권한과 심볼릭 링크를 보존합
 - [Python tkinter](https://docs.python.org/3/library/tkinter.html)
 - [xlwings 설치 및 운영체제별 의존성](https://docs.xlwings.org/en/stable/installation.html)
 - [PyInstaller macOS 앱 빌드](https://pyinstaller.org/en/stable/usage.html#building-macos-app-bundles)
+- [PyInstaller macOS 하위 버전 호환성](https://pyinstaller.org/en/stable/usage.html#making-macos-apps-forward-compatible)

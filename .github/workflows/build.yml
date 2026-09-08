@@ -21,6 +21,8 @@ jobs:
             architecture: arm64
             artifact: macos-arm64
     runs-on: ${{ matrix.os }}
+    env:
+      MACOSX_DEPLOYMENT_TARGET: '15.5'
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
