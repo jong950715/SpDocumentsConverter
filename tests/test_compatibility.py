@@ -15,6 +15,7 @@ import openpyxl
 from src import excel_access, platform_utils
 from src.gui.SpExGui import SpExGui
 from src.gui.ToggleGui import ToggleGui
+from src.write.ecount import EcountWriter as ecount_writer_module
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -103,6 +104,46 @@ class DesktopOperationTests(unittest.TestCase):
         book.activate.assert_called_once()
         book.close.assert_not_called()
         self.assertFalse(Path(snapshot.save.call_args.args[0]).parent.exists())
+
+    def test_output_open_error_survives_cleanup_with_partial_snapshot_reader(self):
+        book = MagicMock()
+        snapshot = book.app.books.add.return_value
+        snapshot_path = None
+
+        def save(path):
+            nonlocal snapshot_path
+            snapshot_path = Path(path)
+            workbook = openpyxl.Workbook()
+            sheet = workbook.active
+            sheet.title = excel_access.SNAPSHOT_SHEET
+            sheet.append(['시간', '챙길것', '품목', '수량', '보험사', '지점',
+                          '주문자이름', '주소', '전화번호', '단가', '금액', '수금'])
+            sheet.append(['#끝'])
+            for row in range(1000):
+                sheet.append([f'unread trailing row {row} ' + ('x' * 200)])
+            workbook.save(path)
+            workbook.close()
+
+        snapshot.save.side_effect = save
+        opener_error = RuntimeError('output opener failed')
+        caught = None
+        writer = None
+        with TemporaryDirectory() as output_directory, \
+                patch.object(excel_access, 'active_book', return_value=book), \
+                patch.object(ecount_writer_module, 'getTempDir', return_value=output_directory), \
+                patch.object(ecount_writer_module, 'open_file', side_effect=opener_error):
+            try:
+                with excel_access.active_sheet() as sheet:
+                    writer = ecount_writer_module.EcountWriter.fromSheet(sheet)
+                    writer.getDocsFromSpEx()
+            except Exception as error:
+                caught = error
+
+        self.assertIs(caught, opener_error)
+        self.assertIsNotNone(caught.__traceback__)
+        self.assertIsNotNone(writer.spExReader.it.gi_frame)
+        self.assertIsNotNone(snapshot_path)
+        self.assertFalse(snapshot_path.parent.exists())
 
     def test_selected_range_preserves_headers_and_rows(self):
         book = MagicMock()

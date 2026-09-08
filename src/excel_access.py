@@ -1,5 +1,6 @@
 """Read saved workbooks or take a temporary snapshot of desktop Excel."""
 
+import io
 from contextlib import contextmanager
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -63,8 +64,14 @@ def active_sheet():
                     snapshot.close()
             finally:
                 book.activate()
-        with open_sheet(path, SNAPSHOT_SHEET) as saved_sheet:
-            yield saved_sheet
+        # Read the disposable snapshot through memory so a partially consumed
+        # read-only iterator cannot retain a Windows handle to input.xlsx.
+        with io.BytesIO(path.read_bytes()) as buffer:
+            workbook = openpyxl.load_workbook(buffer, read_only=True, data_only=True)
+            try:
+                yield workbook[SNAPSHOT_SHEET]
+            finally:
+                workbook.close()
 
 
 def selected_range():
